@@ -52,6 +52,11 @@ jobs:
         run: |
           yarn typecheck:ci
 
+      - name: Start test containers
+        run: |
+          cd docker-oidc-adapters
+          docker compose -f docker-compose.yml up -d --wait
+
       - name: Test
         run: |
           yarn test:ci
