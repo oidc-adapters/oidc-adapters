@@ -1,0 +1,57 @@
+name: ci
+on:
+  push:
+    branches:
+      - develop
+  pull_request_target:
+    branches:
+      - develop
+  workflow_dispatch:
+jobs:
+  build-lint-test:
+    runs-on: ubuntu-22.04
+    name: Build, Lint and Test
+
+    steps:
+      - name: Setup NodeJS
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Cache yarn
+        uses: actions/cache@v3
+        with:
+          path: '.yarn/cache'
+          key: ${{ runner.os }}-yarn-cache-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-cache-
+
+      - name: Corepack
+        run: |
+          corepack enable
+          corepack prepare
+
+      - name: Install
+        run: |
+          yarn
+
+      - name: Build
+        run: |
+          yarn build
+
+      - name: Lint
+        run: |
+          yarn lint:ci
+
+      - name: TypeCheck
+        run: |
+          yarn typecheck:ci
+
+      - name: Test
+        run: |
+          yarn test:ci
