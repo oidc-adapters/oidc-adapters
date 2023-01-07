@@ -1,0 +1,27 @@
+{
+  "name": "@oidc-adapters/oidc-adapters",
+  "private": true,
+  "license": "MIT",
+  "packageManager": "yarn@3.3.1",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "yarn workspaces foreach -ptvi run build",
+    "clean": "yarn workspaces foreach -j unlimited -pvi run clean",
+    "dev": "yarn workspaces foreach -j unlimited -pvi run dev",
+    "lint": "yarn syncpack format && yarn workspaces foreach -j unlimited -pvi run lint",
+    "lint:ci": "yarn workspaces foreach -vi run lint:ci",
+    "preinstall": "npx only-allow yarn",
+    "test": "yarn workspaces foreach -pvi run test",
+    "test:ci": "yarn workspaces foreach -vi run test:ci",
+    "typecheck": "yarn workspaces foreach -ptvi run typecheck",
+    "typecheck:ci": "yarn workspaces foreach -tvi run typecheck:ci"
+  },
+  "devDependencies": {
+    "syncpack": "^8.4.11"
+  },
+  "engines": {
+    "node": ">=16"
+  }
+}
