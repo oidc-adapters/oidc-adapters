@@ -9,7 +9,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "sourceMap": true,
-    "importsNotUsedAsValues": "error",
+    "importsNotUsedAsValues": "remove",
     "types": [
       "node",
       "jest"

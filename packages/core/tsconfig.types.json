@@ -1,0 +1,20 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "**/*.spec.*",
+    "__tests__/**/*",
+    "dist/**/*",
+    "coverage/**/*"
+  ],
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist/types",
+    "declarationDir": "./dist/types",
+    "tsBuildInfoFile": "./dist/types/tsconfig.tsbuildinfo",
+    "incremental": true,
+    "composite": true
+  }
+}

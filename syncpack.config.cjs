@@ -12,6 +12,7 @@ module.exports = {
     'license',
     'type',
     'main',
+    'engines',
     'exports',
     'types',
     'packageManager',

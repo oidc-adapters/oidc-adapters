@@ -1,1 +1,1 @@
-export * from './hello-world.js'
+export * from './strategy.js'

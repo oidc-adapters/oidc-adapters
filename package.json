@@ -2,15 +2,18 @@
   "name": "@oidc-adapters/oidc-adapters",
   "private": true,
   "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
   "packageManager": "yarn@3.3.1",
   "workspaces": [
     "packages/*"
   ],
   "scripts": {
     "build": "yarn workspaces foreach -ptvi run build",
-    "clean": "yarn workspaces foreach -j unlimited -ptvi run clean",
-    "dev": "yarn workspaces foreach -j unlimited -ptvi run dev",
-    "lint": "yarn syncpack format && yarn workspaces foreach -j unlimited -ptvi run lint",
+    "clean": "yarn workspaces foreach -j unlimited -pvi run clean",
+    "dev": "yarn workspaces foreach -j unlimited -pvi run dev",
+    "lint": "yarn syncpack format && yarn workspaces foreach -j unlimited -pvi run lint",
     "lint:ci": "yarn workspaces foreach -tvi run lint:ci",
     "preinstall": "npx only-allow yarn",
     "test": "yarn workspaces foreach -ptvi run test",
@@ -20,8 +23,5 @@
   },
   "devDependencies": {
     "syncpack": "^8.4.11"
-  },
-  "engines": {
-    "node": ">=16"
   }
 }
