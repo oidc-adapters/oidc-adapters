@@ -1,12 +1,19 @@
 {
   "name": "@oidc-adapters/core",
+  "description": "Core features for other packages",
+  "version": "0.0.0-development",
   "license": "MIT",
+  "author": {
+    "name": "Rémi Alvergnat",
+    "email": "toilal.dev@gmail.com",
+    "url": "https://github.com/Toilal"
+  },
   "type": "module",
   "main": "dist/esm/index.js",
+  "types": "dist/types/index.d.ts",
   "engines": {
     "node": ">=18"
   },
-  "types": "dist/types/index.d.ts",
   "scripts": {
     "preinstall": "npx only-allow yarn",
     "build": "yarn build:types && yarn build:swc",
@@ -49,5 +56,9 @@
     "jest-mock": "^29.3.1",
     "jest-mock-extended": "^3.0.1",
     "typescript": "^4.9.4"
-  }
+  },
+  "keywords": [
+    "oidc",
+    "openid"
+  ]
 }

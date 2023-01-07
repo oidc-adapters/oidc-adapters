@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - develop
+      - main
   pull_request_target:
     branches:
       - develop
@@ -60,3 +61,52 @@ jobs:
       - name: Test
         run: |
           yarn test:ci
+
+  release:
+    if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+    needs: build-lint-test
+
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: "Git User config"
+        run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "github-actions"
+
+      - name: "Install Dependencies"
+        run: yarn
+
+      - name: "Build"
+        run: yarn build
+
+      - name: "Update npm"
+        run: |
+          npm --version
+          npm install -g npm@9
+          npm --version
+
+      - name: "Semantic Release"
+        run: yarn multi-semantic-release --debug
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Merge main to develop
+        uses: robotology/gh-action-nightly-merge@v1.3.3
+        with:
+          stable_branch: 'main'
+          development_branch: 'develop'
+          allow_ff: true
+          user_name: github-actions
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

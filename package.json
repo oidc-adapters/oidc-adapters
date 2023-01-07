@@ -1,5 +1,6 @@
 {
   "name": "@oidc-adapters/oidc-adapters",
+  "description": "A collection of Node.js packages to authenticate users from any standard OpenID Connect Identity Provider",
   "private": true,
   "license": "MIT",
   "engines": {
@@ -19,9 +20,12 @@
     "test": "yarn workspaces foreach -ptvi run test",
     "test:ci": "yarn workspaces foreach -tvi run test:ci",
     "typecheck": "yarn workspaces foreach -ptvi run typecheck",
-    "typecheck:ci": "yarn workspaces foreach -tvi run typecheck:ci"
+    "typecheck:ci": "yarn workspaces foreach -tvi run typecheck:ci",
+    "multi-semantic-release": "multi-semantic-release"
   },
   "devDependencies": {
+    "multi-semantic-release": "^3.0.1",
     "syncpack": "^8.4.11"
-  }
+  },
+  "repository": "oidc-adapters/oidc-adapters.git"
 }
