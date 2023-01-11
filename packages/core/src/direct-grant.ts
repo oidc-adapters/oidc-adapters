@@ -10,9 +10,19 @@ export type DirectGrantOptions =
   MetadataOptions
   & Pick<OidcClientSettings, 'client_id' | 'client_secret' | 'scope'>
 
+/**
+ * https://www.ietf.org/rfc/rfc6749.txt
+ * 4.2.2.  Access Token Response
+ * 5.1.  Successful Response
+ */
 export interface DirectGrantResponse {
   [key: string]: unknown,
+
   access_token: string
+  token_type: string,
+  expires_in?: number,
+  refresh_token?: string
+  scopes?: string
 }
 
 export class DirectGrant {
