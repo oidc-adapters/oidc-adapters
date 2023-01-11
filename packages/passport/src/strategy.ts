@@ -1,22 +1,24 @@
 /* eslint-disable promise/no-callback-in-promise */
 
-import type {
-  StrategyOptions as JwtStrategyOptions,
-  VerifyCallback as JwtVerifyCallback,
-  VerifyCallbackWithRequest as JwtVerifyCallbackWithRequest
-} from 'passport-jwt'
+import type { StrategyOptions as JwtStrategyOptions, VerifiedCallback, VerifyCallback as JwtVerifyCallback, VerifyCallbackWithRequest as JwtVerifyCallbackWithRequest } from 'passport-jwt'
 import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt'
 import type { KeyProviderOptions } from '@oidc-adapters/core'
 import { KeyProvider } from '@oidc-adapters/core'
 // eslint-disable-next-line n/no-unpublished-import
 import type { IdTokenClaims } from 'oidc-client-ts'
+import type * as express from 'express'
 
 export interface StrategyOptions extends Omit<Partial<JwtStrategyOptions>, 'secretOrKeyProvider'>, KeyProviderOptions {
 
 }
 
-export type VerifyCallback = JwtVerifyCallback
-export type VerifyCallbackWithRequest = JwtVerifyCallbackWithRequest
+export interface VerifyCallback<T = IdTokenClaims> {
+  (payload: T, done: VerifiedCallback): void;
+}
+
+export interface VerifyCallbackWithRequest<T = IdTokenClaims> {
+  (request: express.Request, payload: T, done: VerifiedCallback): void;
+}
 
 export interface User extends Express.User {
   jwtPayload: IdTokenClaims
@@ -32,6 +34,8 @@ declare global {
 }
 
 export const defaultJwtFromRequest = ExtractJwt.fromExtractors([ExtractJwt.fromAuthHeaderAsBearerToken()])
+
+export const defaultVerify: VerifyCallback = (jwtPayload: IdTokenClaims, done) => done(undefined, { jwtPayload } as User)
 
 export class Strategy extends JwtStrategy {
   name = 'oidc'
@@ -52,7 +56,7 @@ export class Strategy extends JwtStrategy {
       ...opt
     }
 
-    const efffectiveVerify: VerifyCallbackWithRequest | VerifyCallback = verify ?? ((jwtPayload: IdTokenClaims, done) => done(undefined, { jwtPayload } as User)) as VerifyCallback
+    const efffectiveVerify: JwtVerifyCallbackWithRequest | JwtVerifyCallback = verify ?? defaultVerify
 
     super(effectiveOptions, efffectiveVerify)
   }
