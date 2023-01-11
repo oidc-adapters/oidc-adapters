@@ -16,6 +16,7 @@
   },
   "scripts": {
     "preinstall": "npx only-allow yarn",
+    "clean": "rimraf dist/",
     "build": "yarn build:types && yarn build:swc",
     "build:swc": "swc ./src --source-maps inline --out-dir ./dist/esm",
     "build:types": "tsc -p tsconfig.types.json --emitDeclarationOnly",
@@ -58,6 +59,7 @@
     "jest-mock": "^29.3.1",
     "jest-mock-extended": "^3.0.1",
     "oidc-client-ts": "^2.2.0",
+    "rimraf": "^3.0.2",
     "supertest": "^6.3.3",
     "typescript": "^4.9.4"
   },

@@ -1299,6 +1299,7 @@ __metadata:
     jsonwebtoken: ^9.0.0
     jwk-to-pem: ^2.0.5
     oidc-client-ts: ^2
+    rimraf: ^3.0.2
     typescript: ^4.9.4
   languageName: unknown
   linkType: soft
@@ -1365,6 +1366,7 @@ __metadata:
     passport-jwt: ^4
     pify: ^6.1.0
     remove: ^0.1.5
+    rimraf: ^3.0.2
     rsa-compat: ^2.0.8
     selenium-webdriver: ^4.7.1
     server-destroy: ^1.0.1
@@ -1382,6 +1384,7 @@ __metadata:
   resolution: "@oidc-adapters/oidc-adapters@workspace:."
   dependencies:
     multi-semantic-release: ^3.0.1
+    rimraf: ^3.0.2
     syncpack: ^8.4.11
   languageName: unknown
   linkType: soft
@@ -1416,6 +1419,7 @@ __metadata:
     oidc-client-ts: ^2.2.0
     passport: ^0.6.0
     passport-jwt: ^4
+    rimraf: ^3.0.2
     supertest: ^6.3.3
     typescript: ^4.9.4
   languageName: unknown

@@ -25,6 +25,7 @@
   },
   "devDependencies": {
     "multi-semantic-release": "^3.0.1",
+    "rimraf": "^3.0.2",
     "syncpack": "^8.4.11"
   },
   "repository": "oidc-adapters/oidc-adapters.git"
