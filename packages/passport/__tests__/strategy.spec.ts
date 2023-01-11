@@ -1,6 +1,6 @@
 /* eslint-disable jest/no-standalone-expect */
 import type { User } from '../src/strategy.js'
-import { createStrategy } from '../src/strategy.js'
+import { Strategy } from '../src/strategy.js'
 import passport from 'passport'
 import type { Express } from 'express'
 import express from 'express'
@@ -15,7 +15,7 @@ describe('strategy.ts', function () {
     app = express()
     server = app.listen()
 
-    const oidcStrategy = createStrategy({ allowedIssuers: ['http://localhost:8109/realms/master'] })
+    const oidcStrategy = new Strategy({ allowedIssuers: ['http://localhost:8109/realms/master'] })
     passport.use(oidcStrategy)
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
