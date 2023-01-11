@@ -1,4 +1,4 @@
-import type Keycloak from '../index.js'
+import type Keycloak from '../keycloak.js'
 import type { NextFunction, Request, Response } from 'express'
 import type { AuthzPermission, AuthzRequest } from './auth-utils/grant-manager.js'
 

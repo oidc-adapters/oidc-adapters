@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import type { AdapterConfig } from '../../../src/index.js'
-import Keycloak from '../../../src/index.js'
+import type { AdapterConfig } from '../../../src/keycloak.js'
+import Keycloak from '../../../src/keycloak.js'
 import bodyParser from 'body-parser'
 import mustacheExpress from 'mustache-express'
 import type { Express, Request, Response } from 'express'

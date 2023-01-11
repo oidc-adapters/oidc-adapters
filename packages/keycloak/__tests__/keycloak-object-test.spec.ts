@@ -1,8 +1,8 @@
 /**
  * @group unit
  */
-import type { AdapterConfig } from '../src/index.js'
-import Keycloak from '../src/index.js'
+import type { AdapterConfig } from '../src/keycloak.js'
+import Keycloak from '../src/keycloak.js'
 import { MemoryStore } from 'express-session'
 import type { ConfigInput } from '../src/middleware/auth-utils/config.js'
 

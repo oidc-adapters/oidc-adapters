@@ -1,7 +1,7 @@
 import type { URL } from 'node:url'
 import { format as formatUrl } from 'node:url'
 
-import type Keycloak from '../index.js'
+import type Keycloak from '../keycloak.js'
 import type { NextFunction, Request, Response } from 'express'
 
 export default function (keycloak: Keycloak) {

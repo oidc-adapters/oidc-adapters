@@ -11,7 +11,7 @@ import { join } from 'node:path'
 import type { NodeAppOptions } from '../fixtures/node-console/index.js'
 import { NodeApp } from '../fixtures/node-console/index.js'
 import type { ConfigInput } from '../../src/middleware/auth-utils/config.js'
-import type { AdapterConfig } from '../../src/index.js'
+import type { AdapterConfig } from '../../src/keycloak.js'
 import getToken from './token.js'
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url))

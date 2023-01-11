@@ -1,4 +1,4 @@
-import type Keycloak from '../index.js'
+import type Keycloak from '../keycloak.js'
 import type { Request, Response, NextFunction } from 'express'
 
 export default function (keycloak: Keycloak) {

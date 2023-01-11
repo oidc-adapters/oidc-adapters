@@ -1,6 +1,6 @@
 import { v4 as UUID } from 'uuid'
 
-import type Keycloak from '../index.js'
+import type Keycloak from '../keycloak.js'
 import type { NextFunction, Request, Response } from 'express'
 import type Token from './auth-utils/token.js'
 

@@ -1,6 +1,6 @@
 import Token from './auth-utils/token.js'
 import Signature from './auth-utils/signature.js'
-import type Keycloak from '../index.js'
+import type Keycloak from '../keycloak.js'
 import type { NextFunction, Request, Response } from 'express'
 
 function adminLogout (request: Request, response: Response, keycloak: Keycloak) {
