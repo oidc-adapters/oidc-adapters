@@ -17,5 +17,10 @@
     "dist/**/*",
     "coverage/**/*",
     "**/*.jinja.*"
-  ]
+  ],
+  "compilerOptions": {
+    "types": [
+      "@types/jest"
+    ]
+  }
 }

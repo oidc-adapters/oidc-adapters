@@ -22,7 +22,8 @@ module.exports = {
   },
   ignorePatterns: [
     'dist/',
-    'coverage/'
+    'coverage/',
+    '**/*.d.ts'
   ],
   rules: {
     'no-process-exit': 'off', // duplicates with unicorn/no-process-exit

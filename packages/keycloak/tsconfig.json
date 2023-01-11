@@ -16,7 +16,8 @@
   "exclude": [
     "dist/**/*",
     "coverage/**/*",
-    "**/*.jinja.*"
+    "**/*.jinja.*",
+    "example/**/*"
   ],
   "compilerOptions": {
     "types": [
