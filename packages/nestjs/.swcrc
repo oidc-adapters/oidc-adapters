@@ -1,0 +1,15 @@
+{
+  "jsc": {
+    "parser": {
+      "syntax": "typescript",
+      "tsx": false,
+      "decorators": true,
+      "dynamicImport": false
+    },
+    "target": "es2022"
+  },
+  "module": {
+    "type": "es6",
+    "noInterop": false
+  }
+}

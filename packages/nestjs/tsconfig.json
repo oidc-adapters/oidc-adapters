@@ -1,0 +1,28 @@
+{
+  "extends": "../tsconfig.base.json",
+  "include": [
+    "./src/**/*",
+    "./scripts/**/*",
+    "./__tests__/**/*",
+    "./*.json",
+    "./.*.json",
+    "./.*.cjs",
+    "./*.cjs",
+    "./.*.ts",
+    "./*.ts",
+    "./.*.js",
+    "./*.js"
+  ],
+  "exclude": [
+    "dist/**/*",
+    "coverage/**/*",
+    "**/*.jinja.*"
+  ],
+  "compilerOptions": {
+    "types": [
+      "@types/jest"
+    ],
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true
+  }
+}
