@@ -1,2 +1,2 @@
 export * from './oidc-passport.module.js'
-export * from './oidc-passport.guard.js'
+export * from './oidc-auth.guard.js'

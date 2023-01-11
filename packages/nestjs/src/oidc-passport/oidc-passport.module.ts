@@ -41,7 +41,7 @@ export class OidcPassportModule {
       module: OidcPassportModule,
       providers: [
         {
-          provide: `OidcPassportStrategy${options.strategyName ?? 'oidc'}`,
+          provide: `OidcPassportStrategy<${options.strategyName ?? 'oidc'}>`,
           useFactory: () => {
             class StrategyInstance extends PassportStrategy(Strategy, options.strategyName) {
               constructor () {
