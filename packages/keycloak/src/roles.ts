@@ -1,6 +1,7 @@
 import type { RolesProvider } from '@oidc-adapters/core/src/index.js'
+import type { IdTokenClaims } from 'oidc-client-ts'
 
-export interface KeycloakTokenClaims {
+export interface KeycloakTokenClaims extends Partial<IdTokenClaims> {
   realm_access?: {
     roles?: string[]
   }
@@ -51,7 +52,7 @@ export class KeycloakRolesProvider implements RolesProvider {
     return roles
   }
 
-  private hasRoleImpl (role: string, app = this.app) {
+  private hasRoleImpl (role: string, app = this.app ?? this.token.azp) {
     if (app === realmKey) {
       return this.hasRealmRole(role)
     }
