@@ -3,7 +3,15 @@ import type { MetadataOptions } from './metadata.js'
 import { createMetadataService } from './metadata.js'
 
 export class DirectGrantError extends Error {
+  constructor (message: string) {
+    super(message)
+  }
+}
 
+export class DirectGrantResponseError extends DirectGrantError {
+  constructor (private json: Partial<DirectGrantErrorResponse>) {
+    super(json.error_description ?? json.error ?? 'Unknown error')
+  }
 }
 
 export type DirectGrantOptions =
@@ -23,6 +31,18 @@ export interface DirectGrantResponse {
   expires_in?: number,
   refresh_token?: string
   scopes?: string
+}
+
+/**
+ * https://www.ietf.org/rfc/rfc6749.txt
+ * 5.2.  Error Response
+ */
+export interface DirectGrantErrorResponse {
+  [key: string]: unknown,
+
+  error: 'invalid_request' | 'invalid_client' | 'invalid_grant' | 'unauthorized_client' | 'unsupported_grant_type' | 'invalid_scope'
+  error_description?: string,
+  error_uri?: string,
 }
 
 export class DirectGrant {
@@ -54,6 +74,11 @@ export class DirectGrant {
       method: 'post',
       body
     })
+
+    if (!tokenResponse.ok) {
+      const response = await tokenResponse.json() as Partial<DirectGrantErrorResponse>
+      throw new DirectGrantResponseError(response)
+    }
 
     return await tokenResponse.json() as DirectGrantResponse
   }
