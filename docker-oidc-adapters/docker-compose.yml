@@ -22,6 +22,7 @@ services:
       - '8109:8109'
     volumes:
       - ./keycloak/import:/opt/keycloak/data/import
+      - ./keycloak/import:/opt/keycloak/data/export
   keycloak-db:
     image: postgres
     environment:
