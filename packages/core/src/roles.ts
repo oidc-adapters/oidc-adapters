@@ -1,11 +1,5 @@
 export interface RolesProvider {
-  hasRole (role: string): boolean
+  hasRole (role: string): boolean | Promise<boolean>
 
-  getRoles (): string[]
-}
-
-export interface RolesAsyncProvider {
-  hasRole (role: string): Promise<boolean>
-
-  getRoles (): Promise<string[]>
+  getRoles (): string[] | Promise<string[]>
 }

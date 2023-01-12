@@ -44,7 +44,7 @@ export class RoleBasedAccessControlService {
     } // TODO: add support for GraphQL context
   }
 
-  hasAllRoles (context: ExecutionContext, roles: string | string[]): boolean | Promise<boolean> {
+  async hasAllRoles (context: ExecutionContext, roles: string | string[]): Promise<boolean> {
     const rolesProvider = this.getRolesProvider(context)
     if (rolesProvider === undefined) return false
     if (typeof roles === 'string') {
@@ -52,7 +52,9 @@ export class RoleBasedAccessControlService {
     }
 
     for (const role of roles) {
-      if (!rolesProvider.hasRole(role)) {
+      // eslint-disable-next-line @typescript-eslint/await-thenable
+      const hasRole = await rolesProvider.hasRole(role)
+      if (!hasRole) {
         return false
       }
     }
@@ -60,7 +62,7 @@ export class RoleBasedAccessControlService {
     return true
   }
 
-  hasOneRole (context: ExecutionContext, roles: string | string[]): boolean | Promise<boolean> {
+  async hasOneRole (context: ExecutionContext, roles: string | string[]): Promise<boolean> {
     const rolesProvider = this.getRolesProvider(context)
     if (rolesProvider === undefined) return false
     if (typeof roles === 'string') {
@@ -68,7 +70,9 @@ export class RoleBasedAccessControlService {
     }
 
     for (const role of roles) {
-      if (rolesProvider.hasRole(role)) {
+      // eslint-disable-next-line @typescript-eslint/await-thenable
+      const hasRole = await rolesProvider.hasRole(role)
+      if (hasRole) {
         return true
       }
     }
