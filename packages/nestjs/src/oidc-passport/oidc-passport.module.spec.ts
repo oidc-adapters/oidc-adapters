@@ -5,22 +5,13 @@ import { Controller, Get, Request, UseGuards } from '@nestjs/common'
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import type * as Express from 'express'
 import { agent } from 'supertest'
-import { DirectGrant } from '@oidc-adapters/core'
 import { OidcAuthGuard } from './oidc-auth.guard.js'
+import { directGrant } from '../../__tests__/utils/auth.js'
 
 interface TestResponse {
   public: boolean,
   user: typeof Express.request.user
 }
-
-const directGrant = new DirectGrant({
-  authority: 'http://localhost:8109/realms/master',
-  client_id: 'admin-cli'
-})
-
-const tokenReponseJson = await directGrant.password('admin', 'admin')
-
-const accessToken = tokenReponseJson.access_token
 
 @Controller()
 class TestController {
@@ -66,7 +57,7 @@ describe('OidcPassportModule (default)', () => {
   beforeEach(async () => {
     const testingModule = await Test.createTestingModule({
       imports: [
-        OidcPassportModule.forRoot({ options: { allowedIssuers: ['http://localhost:8109/realms/master'] } })
+        OidcPassportModule.forRoot({ options: { allowedIssuers: ['http://localhost:8109/realms/nestjs-test'] } })
       ],
       controllers: [TestController]
     }).compile()
@@ -94,7 +85,7 @@ describe('OidcPassportModule (default)', () => {
     it('should access public endpoint with authentication', async () => {
       const response = await agent(app.getHttpServer())
         .get('/public')
-        .set('Authorization', `Bearer ${accessToken}`)
+        .use(await directGrant('admin', 'admin'))
         .expect(200)
 
       const testBody = response.body as TestResponse
@@ -117,7 +108,7 @@ describe('OidcPassportModule (default)', () => {
     it('should access optional endpoint with authentication', async () => {
       const response = await agent(app.getHttpServer())
         .get('/optional')
-        .set('Authorization', `Bearer ${accessToken}`)
+        .use(await directGrant('admin', 'admin'))
         .expect(200)
 
       const testBody = response.body as TestResponse
@@ -135,7 +126,7 @@ describe('OidcPassportModule (default)', () => {
     it('should access private endpoint with valid bearer token and return user', async () => {
       const response = await agent(app.getHttpServer())
         .get('/private')
-        .set('Authorization', `Bearer ${accessToken}`)
+        .use(await directGrant('admin', 'admin'))
         .expect(200)
 
       const testBody = response.body as TestResponse
