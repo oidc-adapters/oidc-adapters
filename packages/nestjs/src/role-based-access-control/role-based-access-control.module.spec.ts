@@ -93,11 +93,25 @@ describe('RoleBasedAccessControlModule (default)', () => {
         .expect(200)
     })
 
+    it('should not access admin endpoint with authentication but invalid role', async () => {
+      await agent(app.getHttpServer())
+        .get('/admin')
+        .use(await directGrant('user', 'user'))
+        .expect(403)
+    })
+
     it('should access realm admin endpoint with authentication', async () => {
       await agent(app.getHttpServer())
         .get('/realm-admin')
         .use(await directGrant('admin', 'admin'))
         .expect(200)
+    })
+
+    it('should not access realm admin endpoint with authentication but missing role', async () => {
+      await agent(app.getHttpServer())
+        .get('/realm-admin')
+        .use(await directGrant('user', 'user'))
+        .expect(403)
     })
   })
 })

@@ -10,7 +10,7 @@ const defaultDirectGrantOptions: DirectGrantOptions = {
 
 export async function directGrant (username: string, password: string, options?: DirectGrantOptions): Promise<Plugin> {
   const directGrant = new DirectGrant({ ...defaultDirectGrantOptions, ...options })
-  const tokenReponseJson = await directGrant.password('admin', 'admin')
+  const tokenReponseJson = await directGrant.password(username, password)
   const accessToken = tokenReponseJson.access_token
   if (!accessToken) {
     throw new Error('Invalid authentication')
