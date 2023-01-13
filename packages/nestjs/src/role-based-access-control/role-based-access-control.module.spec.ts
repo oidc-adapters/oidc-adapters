@@ -53,8 +53,8 @@ describe('RoleBasedAccessControlModule (default)', () => {
       imports: [
         OidcPassportModule.forRoot({ options: { allowedIssuers: ['http://localhost:8109/realms/nestjs-test'] } }),
         RoleBasedAccessControlModule.forRoot({
-          rolesProviderType: 'user',
-          rolesProvider: (user) => new KeycloakRolesProvider(user.jwtPayload as KeycloakTokenClaims)
+          providerType: 'user',
+          provider: (user) => new KeycloakRolesProvider(user.jwtPayload as KeycloakTokenClaims)
         })
       ],
       controllers: [TestController]

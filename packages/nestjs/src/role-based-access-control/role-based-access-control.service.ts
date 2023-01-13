@@ -7,18 +7,18 @@ export type RoleBasedAccessControlServiceOptions =
   | RoleBasedAccessControlServiceOptionsUser
 
 export interface RoleBasedAccessControlServiceOptionsCommon {
-  rolesProviderType: 'user' | 'context'
-  rolesProvider: UserRolesProviderFactory | ContextRolesProviderFactory
+  providerType: 'user' | 'context'
+  provider: UserRolesProviderFactory | ContextRolesProviderFactory
 }
 
 export interface RoleBasedAccessControlServiceOptionsContext extends RoleBasedAccessControlServiceOptionsCommon {
-  rolesProviderType: 'context'
-  rolesProvider: ContextRolesProviderFactory
+  providerType: 'context'
+  provider: ContextRolesProviderFactory
 }
 
 export interface RoleBasedAccessControlServiceOptionsUser extends RoleBasedAccessControlServiceOptionsCommon {
-  rolesProviderType: 'user'
-  rolesProvider: UserRolesProviderFactory
+  providerType: 'user'
+  provider: UserRolesProviderFactory
 }
 
 export type ContextRolesProviderFactory = (context: ExecutionContext) => RolesProvider
@@ -32,14 +32,14 @@ export class RoleBasedAccessControlService {
   }
 
   getRolesProvider (context: ExecutionContext): RolesProvider | undefined {
-    if (this.options.rolesProviderType === 'context') {
-      return this.options.rolesProvider(context)
-    } else if (this.options.rolesProviderType === 'user' && context.getType() === 'http') {
+    if (this.options.providerType === 'context') {
+      return this.options.provider(context)
+    } else if (this.options.providerType === 'user' && context.getType() === 'http') {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const request = context.switchToHttp().getRequest()
       const user = (request as Express.Request).user
       if (user !== undefined) {
-        return this.options.rolesProvider(user)
+        return this.options.provider(user)
       }
     } // TODO: add support for GraphQL context
   }
