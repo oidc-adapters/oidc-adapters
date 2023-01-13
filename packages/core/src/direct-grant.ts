@@ -61,7 +61,7 @@ export class DirectGrant {
     body.append('grant_type', 'password')
     body.append('client_id', this.options.client_id)
     if (this.options.client_secret) {
-      body.append('client_id', this.options.client_secret)
+      body.append('client_secret', this.options.client_secret)
     }
     if (this.options.scope) {
       body.append('scope', this.options.scope)
