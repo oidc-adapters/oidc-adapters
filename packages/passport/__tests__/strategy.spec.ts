@@ -1,11 +1,11 @@
 /* eslint-disable jest/no-standalone-expect */
-import type { User } from '../src/strategy.js'
 import { Strategy } from '../src/strategy.js'
 import passport from 'passport'
 import type { Express } from 'express'
 import express from 'express'
 import request from 'supertest'
 import { DirectGrant } from '@oidc-adapters/core'
+import jwtDecode from 'jwt-decode'
 
 describe('strategy.ts', function () {
   let app: Express
@@ -21,8 +21,13 @@ describe('strategy.ts', function () {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     app.get('/', passport.authenticate('oidc', { session: false }), (request, response) => {
       expect(request.user).toBeDefined()
-      expect((request.user as User).jwtPayload).toBeDefined()
-      expect((request.user as User).jwtPayload.sub).toBeDefined()
+      const jwtPayload = request.user?.jwtPayload
+      const jwt = request.user?.jwt
+
+      expect(jwtPayload).toBeDefined()
+      expect(jwt).toBeDefined()
+      const decodedJwt = jwtDecode(jwt!)
+      expect(jwtPayload).toEqual(decodedJwt)
 
       response.status(200).json({})
     })

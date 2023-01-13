@@ -1,6 +1,11 @@
 /* eslint-disable promise/no-callback-in-promise */
 
-import type { StrategyOptions as JwtStrategyOptions, VerifiedCallback, VerifyCallback as JwtVerifyCallback, VerifyCallbackWithRequest as JwtVerifyCallbackWithRequest } from 'passport-jwt'
+import type {
+  StrategyOptions as JwtStrategyOptions,
+  VerifiedCallback,
+  VerifyCallback as JwtVerifyCallback,
+  VerifyCallbackWithRequest as JwtVerifyCallbackWithRequest
+} from 'passport-jwt'
 import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt'
 import type { KeyProviderOptions } from '@oidc-adapters/core'
 import { KeyProvider } from '@oidc-adapters/core'
@@ -20,22 +25,26 @@ export interface VerifyCallbackWithRequest<T = IdTokenClaims> {
   (request: express.Request, payload: T, done: VerifiedCallback): void;
 }
 
-export interface User extends Express.User {
-  jwtPayload: IdTokenClaims
-}
-
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     interface User {
       jwtPayload: IdTokenClaims
+      jwt: string
     }
   }
 }
 
 export const defaultJwtFromRequest = ExtractJwt.fromExtractors([ExtractJwt.fromAuthHeaderAsBearerToken()])
 
-export const defaultVerify: VerifyCallback = (jwtPayload: IdTokenClaims, done) => done(undefined, { jwtPayload } as User)
+export const defaultVerifyFactory: (options: JwtStrategyOptions) => VerifyCallbackWithRequest = (options) => (request, jwtPayload: IdTokenClaims, done) => {
+  try {
+    const jwt = options.jwtFromRequest(request)
+    done(undefined, { jwtPayload, jwt } as Express.User)
+  } catch (error) {
+    done(error)
+  }
+}
 
 export class Strategy extends JwtStrategy {
   name = 'oidc'
@@ -53,10 +62,11 @@ export class Strategy extends JwtStrategy {
           return publicKey
         }).catch(done)
       },
+      passReqToCallback: verify !== undefined ? undefined : true,
       ...opt
     }
 
-    const efffectiveVerify: JwtVerifyCallbackWithRequest | JwtVerifyCallback = verify ?? defaultVerify
+    const efffectiveVerify: JwtVerifyCallbackWithRequest | JwtVerifyCallback = verify ?? defaultVerifyFactory(effectiveOptions)
 
     super(effectiveOptions, efffectiveVerify)
   }

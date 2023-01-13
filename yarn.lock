@@ -1468,6 +1468,7 @@ __metadata:
     jest-mock-extended: ^3.0.1
     jest-runner-groups: ^2.2.0
     jwk-to-pem: ^2.0.5
+    jwt-decode: ^3.1.2
     keycloak-request-token: ^0.1.0
     lodash: ^4.17.21
     minimist: ^1.2.7
@@ -1574,6 +1575,7 @@ __metadata:
     jest: ^29.3.1
     jest-mock: ^29.3.1
     jest-mock-extended: ^3.0.1
+    jwt-decode: ^3.1.2
     oidc-client-ts: ^2.2.0
     passport: ^0.6.0
     passport-jwt: ^4
