@@ -11,26 +11,18 @@ export interface KeycloakTokenClaims extends Partial<IdTokenClaims> {
 const realmKey = 'realm'
 
 export class KeycloakRolesProvider implements RolesProvider {
-  constructor (private token: KeycloakTokenClaims, private app?: string) {
-  }
+  private rolesSet: Set<string> = new Set()
+  private hasRolesSet: Set<string> = new Set()
 
-  hasRole (role: string): boolean {
-    const split = role.split(':')
-    if (split.length <= 1) {
-      return this.hasRoleImpl(split[0])
-    }
-    return this.hasRoleImpl(split[1], split[0])
-  }
-
-  getRoles (): string[] {
-    const roles: string[] = []
-
+  constructor (private token: KeycloakTokenClaims, private app = token.azp) {
     if (this.token?.realm_access?.roles !== undefined) {
       for (const role of this.token.realm_access.roles) {
+        this.hasRolesSet.add(`${realmKey}:${role}`)
         if (this.app === realmKey) {
-          roles.push(role)
+          this.rolesSet.add(role)
+          this.hasRolesSet.add(role)
         } else {
-          roles.push(`${realmKey}:${role}`)
+          this.rolesSet.add(`${realmKey}:${role}`)
         }
       }
     }
@@ -39,49 +31,24 @@ export class KeycloakRolesProvider implements RolesProvider {
       for (const [app, appRoles] of Object.entries(this.token.resource_access)) {
         if (appRoles.roles !== undefined) {
           for (const role of appRoles.roles) {
+            this.hasRolesSet.add(`${app}:${role}`)
             if (this.app === app) {
-              roles.push(role)
+              this.rolesSet.add(role)
+              this.hasRolesSet.add(role)
             } else {
-              roles.push(`${app}:${role}`)
+              this.rolesSet.add(`${app}:${role}`)
             }
           }
         }
       }
     }
-
-    return roles
   }
 
-  private hasRoleImpl (role: string, app = this.app ?? this.token.azp) {
-    if (app === realmKey) {
-      return this.hasRealmRole(role)
-    }
-
-    if (app === undefined) {
-      return false
-    }
-
-    return this.hasAppRole(role, app)
+  hasRole (role: string): boolean {
+    return this.hasRolesSet.has(role)
   }
 
-  private hasRealmRole (role: string) {
-    if (this.token?.realm_access?.roles === undefined) {
-      return false
-    }
-
-    return this.token.realm_access.roles.includes(role)
-  }
-
-  private hasAppRole (role: string, app: string) {
-    if (this.token?.resource_access === undefined) {
-      return false
-    }
-
-    const appRoles = this.token.resource_access[app]
-    if (appRoles?.roles === undefined) {
-      return false
-    }
-
-    return appRoles.roles.includes(role)
+  getRoles (): string[] {
+    return [...this.rolesSet]
   }
 }
