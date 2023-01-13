@@ -9,7 +9,7 @@ export class DirectGrantError extends Error {
 }
 
 export class DirectGrantResponseError extends DirectGrantError {
-  constructor (private json: Partial<DirectGrantErrorResponse>) {
+  constructor (public readonly json: Partial<DirectGrantErrorResponse>) {
     super(json.error_description ?? json.error ?? 'Unknown error')
   }
 }
