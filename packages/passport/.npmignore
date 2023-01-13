@@ -1,4 +1,6 @@
 /*
 !/README.md
 !/dist
+/**/*.spec.ts
+/**/*.spec.js
 tsconfig.tsbuildinfo
