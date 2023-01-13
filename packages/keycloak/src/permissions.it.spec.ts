@@ -97,8 +97,15 @@ describe('KeycloakPermissionsProvider', function () {
 
         const permissionsProvider = new KeycloakPermissionsProvider({ token: tokenReponseJson.access_token, ...variant.options })
 
+        expect(await permissionsProvider.hasPermission('resource1#read')).toBe(true)
+        expect(await permissionsProvider.hasPermission('resource2#read')).toBe(true)
         expect(await permissionsProvider.hasPermission('resource1#delete')).toBe(true)
         expect(await permissionsProvider.hasPermission('resource2#delete')).toBe(true)
+        expect(await permissionsProvider.hasPermission('resource1')).toBe(true)
+        expect(await permissionsProvider.hasPermission('resource2')).toBe(true)
+        expect(await permissionsProvider.hasPermission('admin-resource#read')).toBe(true)
+        expect(await permissionsProvider.hasPermission('admin-resource#dummy')).toBe(false)
+        expect(await permissionsProvider.hasPermission('admin-resource')).toBe(true)
         expect(await permissionsProvider.hasPermission('dummy')).toBe(false)
       })
 
@@ -139,6 +146,11 @@ describe('KeycloakPermissionsProvider', function () {
         expect(await permissionsProvider.hasPermission('resource2#read')).toBe(true)
         expect(await permissionsProvider.hasPermission('resource1#delete')).toBe(false)
         expect(await permissionsProvider.hasPermission('resource2#delete')).toBe(false)
+        expect(await permissionsProvider.hasPermission('resource1')).toBe(true)
+        expect(await permissionsProvider.hasPermission('resource2')).toBe(true)
+        expect(await permissionsProvider.hasPermission('admin-resource#read')).toBe(false)
+        expect(await permissionsProvider.hasPermission('admin-resource#dummy')).toBe(false)
+        expect(await permissionsProvider.hasPermission('admin-resource')).toBe(false)
         expect(await permissionsProvider.hasPermission('dummy')).toBe(false)
       })
 

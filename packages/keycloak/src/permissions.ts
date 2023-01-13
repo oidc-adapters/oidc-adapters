@@ -149,6 +149,9 @@ export class KeycloakPermissionsProvider implements PermissionsProvider {
       if ((grantError.json?.error as string) === 'invalid_resource') {
         return false
       }
+      if ((grantError.json?.error as string) === 'invalid_scope') {
+        return false
+      }
       throw error
     }
   }
@@ -212,7 +215,7 @@ export class KeycloakUmaTicketPermissionsProvider implements PermissionsProvider
   }
 
   hasPermission (permission: string): boolean {
-    return this.permissions.has(permission)
+    return this.permissions.has(permission) || this.resourcePermissions.has(permission)
   }
 
   hasResourcePermission (resource: string, permission: string): boolean {
