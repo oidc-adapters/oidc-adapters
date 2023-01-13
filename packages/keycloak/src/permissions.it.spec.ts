@@ -17,7 +17,7 @@ describe('fetchUmaTicket (IT)', function () {
     const umaTicket = await fetchUmaTicketPermissionsToken({ token: tokenReponseJson.access_token })
     expect(umaTicket).toBeDefined()
     expect(umaTicket.authorization).toBeDefined()
-    expect(umaTicket.authorization?.permissions.length).toEqual(4)
+    expect(umaTicket.authorization?.permissions.length).toEqual(3)
     for (const permission of umaTicket.authorization!.permissions) {
       if (permission.rsname !== 'Default Resource') {
         // eslint-disable-next-line jest/no-conditional-expect

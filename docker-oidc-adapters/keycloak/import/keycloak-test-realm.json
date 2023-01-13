@@ -718,17 +718,7 @@
         } ],
         "icon_uri" : ""
       } ],
-      "policies" : [ {
-        "id" : "eb8e907d-e343-4daf-a46f-df648c42fbb8",
-        "name" : "Default Policy",
-        "description" : "A policy that grants access only for users within this realm",
-        "type" : "js",
-        "logic" : "POSITIVE",
-        "decisionStrategy" : "AFFIRMATIVE",
-        "config" : {
-          "code" : "// by default, grants any permission associated with this policy\n$evaluation.grant();\n"
-        }
-      }, {
+      "policies" : [{
         "id" : "ca47e243-fcfa-4308-95bf-7b1084923ad2",
         "name" : "admin",
         "description" : "",
@@ -747,17 +737,6 @@
         "decisionStrategy" : "UNANIMOUS",
         "config" : {
           "roles" : "[{\"id\":\"app-authorization-services-test/user\",\"required\":true}]"
-        }
-      }, {
-        "id" : "78fc0101-6f4b-4f92-9488-8ba5b7716e53",
-        "name" : "Default Permission",
-        "description" : "A permission that applies to the default resource type",
-        "type" : "resource",
-        "logic" : "POSITIVE",
-        "decisionStrategy" : "UNANIMOUS",
-        "config" : {
-          "defaultResourceType" : "urn:app-authorization-services-test:resources:default",
-          "applyPolicies" : "[\"Default Policy\"]"
         }
       }, {
         "id" : "771179b1-024d-4545-b47d-5d223fd937f2",
