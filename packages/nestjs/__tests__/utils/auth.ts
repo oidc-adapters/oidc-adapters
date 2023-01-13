@@ -3,8 +3,9 @@ import { DirectGrant } from '@oidc-adapters/core'
 import type { Plugin } from 'superagent'
 
 const defaultDirectGrantOptions: DirectGrantOptions = {
-  authority: 'http://localhost:8109/realms/nestjs-test',
-  client_id: 'test-app',
+  authority: 'http://localhost:8109/realms/keycloak-test',
+  client_id: 'app-authorization-services-test',
+  client_secret: 'etkjHLXBRPpYSdebPqLM9XrPvkOzbv2d',
   scope: 'openid'
 }
 

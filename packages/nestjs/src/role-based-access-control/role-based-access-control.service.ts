@@ -70,7 +70,6 @@ export class RoleBasedAccessControlService {
     }
 
     for (const role of roles) {
-      // eslint-disable-next-line @typescript-eslint/await-thenable
       const hasRole = await rolesProvider.hasRole(role)
       if (hasRole) {
         return true

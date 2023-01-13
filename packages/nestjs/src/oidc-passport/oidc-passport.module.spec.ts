@@ -57,7 +57,7 @@ describe('OidcPassportModule (default)', () => {
   beforeEach(async () => {
     const testingModule = await Test.createTestingModule({
       imports: [
-        OidcPassportModule.forRoot({ options: { allowedIssuers: ['http://localhost:8109/realms/nestjs-test'] } })
+        OidcPassportModule.forRoot({ options: { allowedIssuers: ['http://localhost:8109/realms/keycloak-test'] } })
       ],
       controllers: [TestController]
     }).compile()

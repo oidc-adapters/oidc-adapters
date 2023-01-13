@@ -12,46 +12,42 @@ import { RolesGuard } from './roles.guard.js'
 import { directGrant } from '../../__tests__/utils/auth.js'
 
 interface TestResponse {
-  public: boolean,
   user: typeof Express.request.user
-}
-
-@Controller()
-class TestController {
-  @Get('/public')
-  getPublic (@Request() request: Express.Request) {
-    return {
-      public: true,
-      user: request.user
-    }
-  }
-
-  @Get('/admin')
-  @UseGuards(OidcAuthGuard(), RolesGuard('admin'))
-  getAdmin (@Request() request: Express.Request) {
-    return {
-      public: true,
-      user: request.user
-    }
-  }
-
-  @Get('/realm-admin')
-  @UseGuards(OidcAuthGuard(), RolesGuard('realm:realm-admin'))
-  getRealmAdmin (@Request() request: Express.Request) {
-    return {
-      public: true,
-      user: request.user
-    }
-  }
 }
 
 describe('RoleBasedAccessControlModule (default)', () => {
   let app: INestApplication
 
+  @Controller()
+  class TestController {
+    @Get('/public')
+    getPublic (@Request() request: Express.Request) {
+      return {
+        user: request.user
+      }
+    }
+
+    @Get('/admin')
+    @UseGuards(OidcAuthGuard(), RolesGuard('admin'))
+    getAdmin (@Request() request: Express.Request) {
+      return {
+        user: request.user
+      }
+    }
+
+    @Get('/realm-admin')
+    @UseGuards(OidcAuthGuard(), RolesGuard('realm:realm-admin'))
+    getRealmAdmin (@Request() request: Express.Request) {
+      return {
+        user: request.user
+      }
+    }
+  }
+
   beforeEach(async () => {
     const testingModule = await Test.createTestingModule({
       imports: [
-        OidcPassportModule.forRoot({ options: { allowedIssuers: ['http://localhost:8109/realms/nestjs-test'] } }),
+        OidcPassportModule.forRoot({ options: { allowedIssuers: ['http://localhost:8109/realms/keycloak-test'] } }),
         RoleBasedAccessControlModule.forRoot({
           providerType: 'user',
           provider: (user) => new KeycloakRolesProvider(user.jwtPayload as KeycloakTokenClaims)
@@ -75,8 +71,6 @@ describe('RoleBasedAccessControlModule (default)', () => {
         .expect(200)
 
       const testBody = response.body as TestResponse
-
-      expect(testBody.public).toBeTruthy()
       expect(testBody.user).toBeUndefined()
     })
 
