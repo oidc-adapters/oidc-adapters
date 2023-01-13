@@ -98,7 +98,7 @@ async function fetchUmaTicket (options?: FetchUmaTicketOptions) {
 }
 
 export async function fetchUmaTicketPermissionsToken (options?: Omit<FetchUmaTicketOptions, 'responseMode'>): Promise<KeycloakUmaTicketTokenClaims> {
-  const umaTicketResponse = await fetchUmaTicket(options)
+  const umaTicketResponse = await fetchUmaTicket({ ...options, responseMode: undefined })
 
   const json = await umaTicketResponse.json() as DirectGrantResponse
   const umaTicket = jwtDecode(json.access_token)
@@ -136,15 +136,17 @@ export class KeycloakPermissionsProvider implements PermissionsProvider {
 
   async evaluatePermission (permission: string) {
     try {
-      const effectivePermission = [...this.effectiveOptions.permission ?? [], permission]
       const umaTicketDecision = await fetchUmaTicketDecision({
         ...this.effectiveOptions,
-        permission: effectivePermission
+        permission
       })
       return !!umaTicketDecision?.result
     } catch (error: unknown) {
       const grantError = error as DirectGrantResponseError
       if ((grantError.json?.error as string) === 'access_denied' && grantError.json?.error_description === 'not_authorized') {
+        return false
+      }
+      if ((grantError.json?.error as string) === 'invalid_resource') {
         return false
       }
       throw error

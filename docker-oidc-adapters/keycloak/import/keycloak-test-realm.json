@@ -67,6 +67,22 @@
       "containerId" : "f1bb2d24-b865-4d75-8d8a-7b7561a756cf",
       "attributes" : { }
     }, {
+      "id" : "a83cf91f-9aca-40ce-82b9-652be65af853",
+      "name" : "realm-user",
+      "description" : "",
+      "composite" : false,
+      "clientRole" : false,
+      "containerId" : "f1bb2d24-b865-4d75-8d8a-7b7561a756cf",
+      "attributes" : { }
+    }, {
+      "id" : "ce8121e7-6e72-41fc-96c9-2c1280d550ac",
+      "name" : "realm-admin",
+      "description" : "",
+      "composite" : false,
+      "clientRole" : false,
+      "containerId" : "f1bb2d24-b865-4d75-8d8a-7b7561a756cf",
+      "attributes" : { }
+    }, {
       "id" : "9b65628a-3c70-477a-9e20-2e6bed1b93a9",
       "name" : "uma_authorization",
       "description" : "${role_uma_authorization}",
@@ -414,7 +430,7 @@
     } ],
     "disableableCredentialTypes" : [ ],
     "requiredActions" : [ ],
-    "realmRoles" : [ "default-roles-keycloak-test" ],
+    "realmRoles" : [ "default-roles-keycloak-test", "realm-admin" ],
     "clientRoles" : {
       "app-authorization-services-test" : [ "admin" ]
     },
@@ -456,7 +472,7 @@
     } ],
     "disableableCredentialTypes" : [ ],
     "requiredActions" : [ ],
-    "realmRoles" : [ "default-roles-keycloak-test" ],
+    "realmRoles" : [ "realm-user", "default-roles-keycloak-test" ],
     "clientRoles" : {
       "app-authorization-services-test" : [ "user" ]
     },
@@ -685,6 +701,22 @@
           "name" : "create"
         } ],
         "icon_uri" : ""
+      }, {
+        "name" : "admin-resource",
+        "ownerManagedAccess" : false,
+        "attributes" : { },
+        "_id" : "4f009aca-b201-4196-87c1-b9972ac05a3b",
+        "uris" : [ ],
+        "scopes" : [ {
+          "name" : "read"
+        }, {
+          "name" : "update"
+        }, {
+          "name" : "delete"
+        }, {
+          "name" : "create"
+        } ],
+        "icon_uri" : ""
       } ],
       "policies" : [ {
         "id" : "eb8e907d-e343-4daf-a46f-df648c42fbb8",
@@ -714,7 +746,7 @@
         "logic" : "POSITIVE",
         "decisionStrategy" : "UNANIMOUS",
         "config" : {
-          "roles" : "[{\"id\":\"app-authorization-services-test/user\",\"required\":false}]"
+          "roles" : "[{\"id\":\"app-authorization-services-test/user\",\"required\":true}]"
         }
       }, {
         "id" : "78fc0101-6f4b-4f92-9488-8ba5b7716e53",
@@ -728,16 +760,27 @@
           "applyPolicies" : "[\"Default Policy\"]"
         }
       }, {
+        "id" : "771179b1-024d-4545-b47d-5d223fd937f2",
+        "name" : "admin all resources",
+        "description" : "",
+        "type" : "resource",
+        "logic" : "POSITIVE",
+        "decisionStrategy" : "AFFIRMATIVE",
+        "config" : {
+          "resources" : "[\"resource1\",\"admin-resource\",\"resource2\"]",
+          "applyPolicies" : "[\"admin\"]"
+        }
+      }, {
         "id" : "4745c394-e4ee-417e-b9fe-f1818784eb63",
         "name" : "user resource1",
         "description" : "",
         "type" : "scope",
         "logic" : "POSITIVE",
-        "decisionStrategy" : "UNANIMOUS",
+        "decisionStrategy" : "AFFIRMATIVE",
         "config" : {
           "resources" : "[\"resource1\"]",
           "scopes" : "[\"read\"]",
-          "applyPolicies" : "[\"user\"]"
+          "applyPolicies" : "[\"user\",\"admin\"]"
         }
       }, {
         "id" : "863e94d6-eb4f-47a7-94bb-8e40225823ad",
@@ -745,22 +788,12 @@
         "description" : "",
         "type" : "scope",
         "logic" : "POSITIVE",
-        "decisionStrategy" : "UNANIMOUS",
+        "decisionStrategy" : "AFFIRMATIVE",
         "config" : {
+          "defaultResourceType" : "",
           "resources" : "[\"resource2\"]",
           "scopes" : "[\"read\"]",
-          "applyPolicies" : "[\"user\"]"
-        }
-      }, {
-        "id" : "771179b1-024d-4545-b47d-5d223fd937f2",
-        "name" : "admin all resources",
-        "description" : "",
-        "type" : "resource",
-        "logic" : "POSITIVE",
-        "decisionStrategy" : "UNANIMOUS",
-        "config" : {
-          "resources" : "[\"resource1\",\"resource2\"]",
-          "applyPolicies" : "[\"admin\"]"
+          "applyPolicies" : "[\"user\",\"admin\"]"
         }
       } ],
       "scopes" : [ {
@@ -780,7 +813,7 @@
         "name" : "delete",
         "iconUri" : ""
       } ],
-      "decisionStrategy" : "UNANIMOUS"
+      "decisionStrategy" : "AFFIRMATIVE"
     }
   }, {
     "id" : "40dfb90e-1acf-4a30-8b18-95865d8381d8",
