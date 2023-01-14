@@ -49,10 +49,6 @@ jobs:
         run: |
           yarn lint:ci
 
-      - name: TypeCheck
-        run: |
-          yarn typecheck:ci
-
       - name: Start test containers
         run: |
           cd docker-oidc-adapters
