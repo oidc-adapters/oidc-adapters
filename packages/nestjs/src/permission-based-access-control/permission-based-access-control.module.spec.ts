@@ -2,7 +2,6 @@ import { Test } from '@nestjs/testing'
 import type { INestApplication } from '@nestjs/common'
 import { Controller, Delete, Get, Request, UseGuards } from '@nestjs/common'
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-import type * as Express from 'express'
 import { agent } from 'supertest'
 import { PermissionBasedAccessControlModule } from './permission-based-access-control.module.js'
 import { OidcPassportModule } from '../oidc-passport/index.js'
@@ -15,9 +14,10 @@ import { Resource } from './resource.decorator.js'
 import { Scopes } from './scopes.decorator.js'
 import { PermissionsAuthGuard } from './permissions-auth-guard.decorator.js'
 import { Public } from '../common/public.decorator.js'
+import { Jwt, JwtPayload, User } from '../common/index.js'
 
 interface TestResponse {
-  user: typeof Express.request.user
+  user: Express.User
 }
 
 describe('PermissionBasedAccessControlModule', () => {
@@ -31,6 +31,24 @@ describe('PermissionBasedAccessControlModule', () => {
       return {
         user: request.user
       }
+    }
+
+    @Get('/user')
+    @UseGuards(OptionalAuthGuard(AuthGuard('oidc')))
+    getUser (@User() user?: Express.User) {
+      return { user }
+    }
+
+    @Get('/jwt')
+    @UseGuards(OptionalAuthGuard(AuthGuard('oidc')))
+    getJwt (@Jwt() jwt?: string) {
+      return { jwt }
+    }
+
+    @Get('/jwt-payload')
+    @UseGuards(OptionalAuthGuard(AuthGuard('oidc')))
+    getJwtPayload (@JwtPayload() jwtPayload?: string) {
+      return { jwtPayload }
     }
 
     @Get('/resource1')
@@ -97,6 +115,54 @@ describe('PermissionBasedAccessControlModule', () => {
     const testBody = response.body as TestResponse
 
     expect(testBody.user).toBeDefined()
+  })
+
+  it('should get user from decorator with authentication', async () => {
+    const response = await agent(app.getHttpServer())
+      .get('/user')
+      .use(await directGrant('admin', 'admin'))
+      .expect(200)
+
+    const { user } = response.body as TestResponse
+
+    expect(user).toBeDefined()
+    expect(user.jwt).toBeDefined()
+    expect(user.jwtPayload).toBeDefined()
+    expect(user.jwtPayload.sub).toBeDefined()
+  })
+
+  it('should get undefined user from decorator without authentication', async () => {
+    const response = await agent(app.getHttpServer())
+      .get('/user')
+      .expect(200)
+
+    const { user } = response.body as TestResponse
+
+    expect(user).toBeUndefined()
+  })
+
+  it('should get jwt payload from decorator with authentication', async () => {
+    const response = await agent(app.getHttpServer())
+      .get('/jwt-payload')
+      .use(await directGrant('admin', 'admin'))
+      .expect(200)
+
+    const { jwtPayload } = response.body as { jwtPayload: Express.User['jwtPayload'] }
+
+    expect(jwtPayload).toBeDefined()
+    expect(jwtPayload.sub).toBeDefined()
+  })
+
+  it('should get jwt from decorator with authentication', async () => {
+    const response = await agent(app.getHttpServer())
+      .get('/jwt')
+      .use(await directGrant('admin', 'admin'))
+      .expect(200)
+
+    const { jwt } = response.body as { jwt: string }
+
+    expect(jwt).toBeDefined()
+    expect(jwt.length > 50).toBe(true)
   })
 
   it('should not access resource1 GET without authentication', async () => {

@@ -1,6 +1,7 @@
 import type { ExecutionContext } from '@nestjs/common'
 import { Inject, Injectable } from '@nestjs/common'
 import type { RolesProvider } from '@oidc-adapters/core'
+import { userFromContext } from '../common/context.utils.js'
 
 export type RoleBasedAccessControlServiceOptions =
   RoleBasedAccessControlServiceOptionsContext
@@ -34,14 +35,12 @@ export class RoleBasedAccessControlService {
   private getRolesProvider (context: ExecutionContext): RolesProvider | undefined {
     if (this.options.providerType === 'context') {
       return this.options.provider(context)
-    } else if (this.options.providerType === 'user' && context.getType() === 'http') {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const request = context.switchToHttp().getRequest()
-      const user = (request as Express.Request).user
+    } else if (this.options.providerType === 'user') {
+      const user = userFromContext(context)
       if (user !== undefined) {
         return this.options.provider(user)
       }
-    } // TODO: add support for GraphQL context
+    }
   }
 
   async hasAllRoles (context: ExecutionContext, roles: string | Iterable<string>): Promise<boolean> {

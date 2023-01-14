@@ -1,6 +1,7 @@
 import type { ExecutionContext } from '@nestjs/common'
 import { Inject, Injectable } from '@nestjs/common'
 import type { PermissionsProvider } from '@oidc-adapters/core'
+import { userFromContext } from '../common/context.utils.js'
 
 export type PermissionBasedAccessControlServiceOptions =
   PermissionBasedAccessControlServiceOptionsContext
@@ -41,10 +42,9 @@ export class PermissionBasedAccessControlService {
   getPermissionsProvider (context: ExecutionContext): PermissionsProvider | undefined {
     if (this.options.providerType === 'context') {
       return this.options.provider(context)
-    } else if (this.options.providerType === 'user' && context.getType() === 'http') {
+    } else if (this.options.providerType === 'user') {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const request = context.switchToHttp().getRequest()
-      const user = (request as Express.Request).user
+      const user = userFromContext(context)
       if (user !== undefined) {
         return this.options.provider(user)
       }
