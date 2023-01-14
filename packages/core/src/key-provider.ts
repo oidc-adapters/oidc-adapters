@@ -4,8 +4,11 @@ import type { JWK } from 'jwk-to-pem'
 import jwkToPem from 'jwk-to-pem'
 import type { JwtClaims, SigningKey } from 'oidc-client-ts'
 
+export type IssuerCheckSpec = (string | RegExp)[] | ((issuer: string) => boolean)
+
 export interface KeyProviderOptions {
-  allowedIssuers: (string | RegExp)[] | ((issuer: string) => boolean)
+  allowedIssuers: IssuerCheckSpec
+  deniedIssuers?: IssuerCheckSpec
 }
 
 export class KeyProviderError extends Error {}
@@ -25,6 +28,28 @@ export class KeyProvider {
     this.keysCache.clear()
   }
 
+  private evaluateIssuerSpec (issuer: string, spec?: IssuerCheckSpec) {
+    if (typeof spec === 'function') {
+      if (spec(issuer)) {
+        return true
+      }
+    } else if (spec) {
+      for (const specIssuer of spec) {
+        if (typeof specIssuer === 'string') {
+          if (specIssuer === issuer) {
+            return true
+          }
+        } else {
+          if (specIssuer.test(issuer)) {
+            return true
+          }
+        }
+      }
+    }
+
+    return false
+  }
+
   async getPublicKey (token: string): Promise<string> {
     // eslint-disable-next-line import/no-named-as-default-member
     const decoded = jwt.decode(token, { complete: true })
@@ -37,29 +62,15 @@ export class KeyProvider {
       throw new KeyProviderError('Token issuer is not defined')
     }
 
-    let allowed = false
-    if (typeof this.options.allowedIssuers === 'function') {
-      if (this.options.allowedIssuers(issuer)) {
-        allowed = true
-      }
-    } else {
-      for (const allowedIssuer of this.options.allowedIssuers) {
-        if (typeof allowedIssuer === 'string') {
-          if (allowedIssuer === issuer) {
-            allowed = true
-            break
-          }
-        } else {
-          if (allowedIssuer.test(issuer)) {
-            allowed = true
-            break
-          }
-        }
-      }
-    }
+    const allowed = this.evaluateIssuerSpec(issuer, this.options.allowedIssuers)
+    const denied = this.evaluateIssuerSpec(issuer, this.options.deniedIssuers)
 
     if (!allowed) {
       throw new KeyProviderError(`Token issuer "${issuer}" is not allowed`)
+    }
+
+    if (denied) {
+      throw new KeyProviderError(`Token issuer "${issuer}" is denied`)
     }
 
     let newKeys: SigningKey[] | undefined
