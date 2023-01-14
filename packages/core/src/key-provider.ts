@@ -5,7 +5,7 @@ import jwkToPem from 'jwk-to-pem'
 import type { JwtClaims, SigningKey } from 'oidc-client-ts'
 
 export interface KeyProviderOptions {
-  allowedIssuers: string[] | ((issuer: string) => boolean)
+  allowedIssuers: (string | RegExp)[] | ((issuer: string) => boolean)
 }
 
 export class KeyProviderError extends Error {}
@@ -37,14 +37,27 @@ export class KeyProvider {
       throw new KeyProviderError('Token issuer is not defined')
     }
 
-    let allowed = true
+    let allowed = false
     if (typeof this.options.allowedIssuers === 'function') {
-      if (!this.options.allowedIssuers(issuer)) {
-        allowed = false
+      if (this.options.allowedIssuers(issuer)) {
+        allowed = true
       }
-    } else if (!this.options.allowedIssuers.includes(issuer)) {
-      allowed = false
+    } else {
+      for (const allowedIssuer of this.options.allowedIssuers) {
+        if (typeof allowedIssuer === 'string') {
+          if (allowedIssuer === issuer) {
+            allowed = true
+            break
+          }
+        } else {
+          if (allowedIssuer.test(issuer)) {
+            allowed = true
+            break
+          }
+        }
+      }
     }
+
     if (!allowed) {
       throw new KeyProviderError(`Token issuer "${issuer}" is not allowed`)
     }
