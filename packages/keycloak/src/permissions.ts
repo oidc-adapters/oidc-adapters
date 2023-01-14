@@ -218,9 +218,15 @@ export class KeycloakUmaTicketPermissionsProvider implements PermissionsProvider
     return this.permissions.has(permission) || this.resourcePermissions.has(permission)
   }
 
-  hasResourcePermission (resource: string, permission: string): boolean {
+  hasResourcePermission (resource: string, permission?: string): boolean {
     const currentResourcePermissions = this.resourcePermissions.get(resource)
-    return currentResourcePermissions ? currentResourcePermissions.has(permission) : false
+    if (currentResourcePermissions === undefined) {
+      return false
+    }
+    if (permission === undefined) {
+      return true
+    }
+    return currentResourcePermissions.has(permission)
   }
 
   getPermissions (): string[] {
