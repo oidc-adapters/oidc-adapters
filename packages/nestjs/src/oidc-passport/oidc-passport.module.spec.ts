@@ -5,8 +5,9 @@ import { Controller, Get, Request, UseGuards } from '@nestjs/common'
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import type * as Express from 'express'
 import { agent } from 'supertest'
-import { OidcAuthGuard } from './oidc-auth.guard.js'
 import { directGrant } from '../../__tests__/utils/auth.js'
+import { AuthGuard } from '@nestjs/passport'
+import { OptionalAuthGuard } from './optional-auth.guard.js'
 
 interface TestResponse {
   public: boolean,
@@ -24,7 +25,7 @@ class TestController {
   }
 
   @Get('/optional')
-  @UseGuards(OidcAuthGuard({ optional: true }))
+  @UseGuards(OptionalAuthGuard(AuthGuard('oidc')))
   getOptional (@Request() request: Express.Request) {
     return {
       public: true,
@@ -33,7 +34,7 @@ class TestController {
   }
 
   @Get('/custom')
-  @UseGuards(OidcAuthGuard({ type: 'oidc-custom' }))
+  @UseGuards(AuthGuard('oidc-custom'))
   getCustom (@Request() request: Express.Request) {
     return {
       public: true,
@@ -42,7 +43,7 @@ class TestController {
   }
 
   @Get('/private')
-  @UseGuards(OidcAuthGuard())
+  @UseGuards(AuthGuard('oidc'))
   getPrivate (@Request() request: Express.Request) {
     return {
       public: false,

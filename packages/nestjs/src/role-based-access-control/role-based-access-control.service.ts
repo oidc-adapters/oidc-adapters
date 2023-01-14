@@ -24,14 +24,14 @@ export interface RoleBasedAccessControlServiceOptionsUser extends RoleBasedAcces
 export type ContextRolesProviderFactory = (context: ExecutionContext) => RolesProvider
 export type UserRolesProviderFactory = (user: Express.User) => RolesProvider
 
-export const SERVICE_OPTIONS = Symbol('RoleBasedAccessControlServiceOptions')
+export const ROLE_BASED_ACCESS_CONTROL_SERVICE_OPTIONS = Symbol('RoleBasedAccessControlServiceOptions')
 
 @Injectable()
 export class RoleBasedAccessControlService {
-  constructor (@Inject(SERVICE_OPTIONS) private options: RoleBasedAccessControlServiceOptions) {
+  constructor (@Inject(ROLE_BASED_ACCESS_CONTROL_SERVICE_OPTIONS) private options: RoleBasedAccessControlServiceOptions) {
   }
 
-  getRolesProvider (context: ExecutionContext): RolesProvider | undefined {
+  private getRolesProvider (context: ExecutionContext): RolesProvider | undefined {
     if (this.options.providerType === 'context') {
       return this.options.provider(context)
     } else if (this.options.providerType === 'user' && context.getType() === 'http') {
@@ -44,7 +44,7 @@ export class RoleBasedAccessControlService {
     } // TODO: add support for GraphQL context
   }
 
-  async hasAllRoles (context: ExecutionContext, roles: string | string[]): Promise<boolean> {
+  async hasAllRoles (context: ExecutionContext, roles: string | Iterable<string>): Promise<boolean> {
     const rolesProvider = this.getRolesProvider(context)
     if (rolesProvider === undefined) return false
     if (typeof roles === 'string') {
@@ -62,7 +62,7 @@ export class RoleBasedAccessControlService {
     return true
   }
 
-  async hasOneRole (context: ExecutionContext, roles: string | string[]): Promise<boolean> {
+  async hasOneRole (context: ExecutionContext, roles: string | Iterable<string>): Promise<boolean> {
     const rolesProvider = this.getRolesProvider(context)
     if (rolesProvider === undefined) return false
     if (typeof roles === 'string') {

@@ -24,11 +24,18 @@ export interface PermissionBasedAccessControlServiceOptionsUser extends Permissi
 export type ContextPermissionsProviderFactory = (context: ExecutionContext) => PermissionsProvider
 export type UserPermissionsProviderFactory = (user: Express.User) => PermissionsProvider
 
-export const SERVICE_OPTIONS = Symbol('PermissionBasedAccessControlServiceOptions')
+export const PERMISSION_BASED_ACCESS_CONTROL_SERVICE_OPTIONS = Symbol('PermissionBasedAccessControlServiceOptions')
+
+export interface PermissionScopesSpec {
+  resource?: string,
+  scopes: string | string[]
+}
+
+export type PermissionsSpec = string | PermissionScopesSpec | (string | PermissionScopesSpec)[]
 
 @Injectable()
 export class PermissionBasedAccessControlService {
-  constructor (@Inject(SERVICE_OPTIONS) private options: PermissionBasedAccessControlServiceOptions) {
+  constructor (@Inject(PERMISSION_BASED_ACCESS_CONTROL_SERVICE_OPTIONS) private options: PermissionBasedAccessControlServiceOptions) {
   }
 
   getPermissionsProvider (context: ExecutionContext): PermissionsProvider | undefined {
@@ -44,34 +51,62 @@ export class PermissionBasedAccessControlService {
     } // TODO: add support for GraphQL context
   }
 
-  async hasAllPermissions (context: ExecutionContext, permissions: string | string[]): Promise<boolean> {
+  async hasAllPermissions (context: ExecutionContext, permissions: PermissionsSpec): Promise<boolean> {
     const permissionsProvider = this.getPermissionsProvider(context)
     if (permissionsProvider === undefined) return false
-    if (typeof permissions === 'string') {
+    if (!Array.isArray(permissions)) {
       permissions = [permissions]
     }
 
     for (const permission of permissions) {
-      const hasPermission = await permissionsProvider.hasPermission(permission)
-      if (!hasPermission) {
-        return false
+      if (typeof permission === 'string') {
+        const hasPermission = await permissionsProvider.hasPermission(permission)
+        if (!hasPermission) {
+          return false
+        }
+      } else if (permission.scopes.length === 0) {
+        const hasPermission = await permissionsProvider.hasPermission(permission.resource ?? '')
+        if (!hasPermission) {
+          return false
+        }
+      } else {
+        for (const scope of permission.scopes) {
+          const hasPermission = await permissionsProvider.hasResourcePermission(permission.resource ?? '', scope)
+          if (!hasPermission) {
+            return false
+          }
+        }
       }
     }
 
     return true
   }
 
-  async hasOnePermission (context: ExecutionContext, permissions: string | string[]): Promise<boolean> {
+  async hasOnePermission (context: ExecutionContext, permissions: PermissionsSpec): Promise<boolean> {
     const permissionsProvider = this.getPermissionsProvider(context)
     if (permissionsProvider === undefined) return false
-    if (typeof permissions === 'string') {
+    if (!Array.isArray(permissions)) {
       permissions = [permissions]
     }
 
     for (const permission of permissions) {
-      const hasPermission = await permissionsProvider.hasPermission(permission)
-      if (hasPermission) {
-        return true
+      if (typeof permission === 'string') {
+        const hasPermission = await permissionsProvider.hasPermission(permission)
+        if (hasPermission) {
+          return true
+        }
+      } else if (permission.scopes.length === 0) {
+        const hasPermission = await permissionsProvider.hasPermission(permission.resource ?? '')
+        if (hasPermission) {
+          return true
+        }
+      } else {
+        for (const scope of permission.scopes) {
+          const hasPermission = await permissionsProvider.hasResourcePermission(permission.resource ?? '', scope)
+          if (hasPermission) {
+            return true
+          }
+        }
       }
     }
 
