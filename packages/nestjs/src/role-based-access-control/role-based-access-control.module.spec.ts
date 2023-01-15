@@ -219,7 +219,7 @@ describe('RoleBasedAccessControlModule (decorators on handlers)', () => {
   })
 })
 
-describe('RoleBasedAccessControlModule (decorators on class and handles)', () => {
+describe('RoleBasedAccessControlModule (decorators on class and handlers)', () => {
   let app: INestApplication
 
   @Controller()

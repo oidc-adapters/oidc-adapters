@@ -1,34 +1,38 @@
-import type { DynamicModule } from '@nestjs/common'
+import type {
+  CanActivate,
+  DynamicModule,
+  InjectionToken,
+  ModuleMetadata,
+  OptionalFactoryDependency,
+  Provider,
+  Type
+} from '@nestjs/common'
 import { Module } from '@nestjs/common'
-import type { StrategyOptions, VerifyCallbackWithRequest } from '@oidc-adapters/passport'
+import type { StrategyOptions, VerifyCallback, VerifyCallbackWithRequest } from '@oidc-adapters/passport'
 import { Strategy } from '@oidc-adapters/passport'
-import type { VerifyCallback } from '@oidc-adapters/passport/src/index.js'
 import { AuthGuard, PassportStrategy } from '@nestjs/passport'
-import { APP_GUARD } from '@nestjs/core'
+import { APP_GUARD, ModuleRef } from '@nestjs/core'
 import { OptionalAuthGuard } from './optional-auth.guard.js'
 
-export interface OidcPassportModuleOptions {
+export const OIDC_PASSPORT_OPTIONS = Symbol('OidcPassportOptions')
+
+export interface OidcPassportOptions {
   options: StrategyOptions,
   verify?: VerifyCallback | VerifyCallbackWithRequest,
-  strategyName?: string,
+  strategyName?: string
   appGuard?: boolean | 'optional'
 }
 
-function applyAppGuard (module: DynamicModule, appGuard: OidcPassportModuleOptions['appGuard'], effectiveStrategyName = 'oidc') {
-  if (!appGuard) return
+export interface OidcPassportOptionsFactory {
+  createOidcPassportOptions (): Promise<OidcPassportOptions> | OidcPassportOptions;
+}
 
-  if (module.providers === undefined) module.providers = []
-  if (appGuard === 'optional') {
-    module.providers.push({
-      provide: APP_GUARD,
-      useClass: OptionalAuthGuard(AuthGuard(effectiveStrategyName))
-    })
-  } else {
-    module.providers.push({
-      provide: APP_GUARD,
-      useClass: AuthGuard(effectiveStrategyName)
-    })
-  }
+export interface OidcPassportAsyncOptions extends Pick<ModuleMetadata, 'imports'> {
+  inject?: (InjectionToken | OptionalFactoryDependency)[];
+  useClass?: Type<OidcPassportOptionsFactory>
+  useExisting?: Type<OidcPassportOptionsFactory>
+  useFactory?: (...arguments_: never[]) => Promise<OidcPassportOptions> | OidcPassportOptions
+  extraProviders?: Provider[]
 }
 
 /**
@@ -36,53 +40,115 @@ function applyAppGuard (module: DynamicModule, appGuard: OidcPassportModuleOptio
  */
 @Module({})
 export class OidcPassportModule {
-  static forRoot (options: OidcPassportModuleOptions): DynamicModule {
-    const module: DynamicModule = {
-      module: OidcPassportModule,
-      providers: [
-        {
-          provide: 'OidcPassportStrategy',
-          useFactory: () => {
-            class StrategyInstance extends PassportStrategy(Strategy, options.strategyName) {
-              constructor () {
-                super(options.options, options.verify)
-              }
-            }
-
-            return new StrategyInstance()
-          }
-        }
-      ]
-    }
-
-    applyAppGuard(module, options.appGuard, options.strategyName)
-
-    return module
+  private static createProviders (options: OidcPassportOptions, feature?: string): Provider[] {
+    return [this.createOptionsProvider(options), this.createPassportStrategyProvider(feature), this.createAppGuardProvider()]
   }
 
-  static forFeature (options: OidcPassportModuleOptions): DynamicModule {
-    const module: DynamicModule = {
-      module: OidcPassportModule,
-      providers: [
-        {
-          provide: `OidcPassportStrategy<${options.strategyName ?? 'oidc'}>`,
-          useFactory: () => {
-            class StrategyInstance extends PassportStrategy(Strategy, options.strategyName) {
-              constructor () {
-                super(options.options, options.verify)
-              }
-            }
+  private static createAsyncProviders (options: OidcPassportAsyncOptions, feature?: string): Provider[] {
+    const providers: Provider[] = [this.createAsyncOptionsProvider(options), this.createPassportStrategyProvider(feature), this.createAppGuardProvider(), ...(options.extraProviders ?? [])]
 
-            return new StrategyInstance()
-          }
-        }
-      ]
+    if (options.useClass) {
+      providers.push({
+        provide: options.useClass,
+        useClass: options.useClass
+      })
     }
 
-    applyAppGuard(module, options.appGuard, options.strategyName)
-
-    return module
+    return providers
   }
 
-  static register = (options: OidcPassportModuleOptions) => OidcPassportModule.forFeature(options)
+  private static createOptionsProvider (options: OidcPassportOptions): Provider {
+    return {
+      provide: OIDC_PASSPORT_OPTIONS,
+      useValue: options
+    }
+  }
+
+  private static createAsyncOptionsProvider (options: OidcPassportAsyncOptions): Provider {
+    if (options.useFactory) {
+      return {
+        provide: OIDC_PASSPORT_OPTIONS,
+        useFactory: options.useFactory,
+        inject: options.inject || []
+      }
+    }
+
+    const inject = options.useExisting ?? options.useClass
+
+    if (!inject) {
+      throw new Error('At least one of useFactory, useExisting or useClass option should be defined')
+    }
+
+    return {
+      provide: OIDC_PASSPORT_OPTIONS,
+      useFactory: async (optionsFactory: OidcPassportOptionsFactory) => {
+        return optionsFactory.createOidcPassportOptions()
+      },
+      inject: [inject]
+    }
+  }
+
+  private static createPassportStrategyProvider (feature?: string): Provider {
+    return {
+      provide: `OidcPassportStrategy${feature ? `<${feature}>` : ''}`,
+      inject: [OIDC_PASSPORT_OPTIONS],
+      useFactory: (options: OidcPassportOptions) => {
+        class StrategyInstance extends PassportStrategy(Strategy, options.strategyName) {
+          constructor () {
+            super(options.options, options.verify)
+          }
+        }
+
+        return new StrategyInstance()
+      }
+    }
+  }
+
+  private static createAppGuardProvider (): Provider {
+    return {
+      provide: APP_GUARD,
+      inject: [OIDC_PASSPORT_OPTIONS, ModuleRef],
+      useFactory: (options: OidcPassportOptions): Type<CanActivate> | CanActivate | undefined => {
+        if (options.appGuard === 'optional') {
+          return OptionalAuthGuard(options.strategyName ?? 'oidc')
+        } else if (options.appGuard) {
+          return AuthGuard(options.strategyName ?? 'oidc')
+        }
+      }
+    }
+  }
+
+  static forRoot (options: OidcPassportOptions): DynamicModule {
+    return {
+      module: OidcPassportModule,
+      providers: this.createProviders(options)
+    }
+  }
+
+  static forRootAsync (options: OidcPassportAsyncOptions): DynamicModule {
+    return {
+      module: OidcPassportModule,
+      imports: options.imports,
+      providers: this.createAsyncProviders(options)
+    }
+  }
+
+  static forFeature (options: OidcPassportOptions & { feature?: string }): DynamicModule {
+    return {
+      module: OidcPassportModule,
+      providers: this.createProviders(options, options.feature ?? options.strategyName ?? 'oidc')
+    }
+  }
+
+  static forFeatureAsync (options: OidcPassportAsyncOptions & { feature: string }): DynamicModule {
+    return {
+      module: OidcPassportModule,
+      imports: options.imports,
+      providers: this.createAsyncProviders(options, options.feature)
+    }
+  }
+
+  static register = (options: OidcPassportOptions) => OidcPassportModule.forFeature(options)
+
+  static registerAsync = (options: OidcPassportAsyncOptions & { feature: string }) => OidcPassportModule.forFeatureAsync(options)
 }
