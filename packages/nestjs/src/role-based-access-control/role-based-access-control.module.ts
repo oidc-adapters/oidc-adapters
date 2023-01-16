@@ -1,4 +1,12 @@
-import type { CanActivate, DynamicModule, InjectionToken, ModuleMetadata, OptionalFactoryDependency, Provider, Type } from '@nestjs/common'
+import type {
+  CanActivate,
+  DynamicModule,
+  InjectionToken,
+  ModuleMetadata,
+  OptionalFactoryDependency,
+  Provider,
+  Type
+} from '@nestjs/common'
 import { Module } from '@nestjs/common'
 import type { RoleBasedAccessControlServiceOptions } from './role-based-access-control.service.js'
 import {
@@ -120,6 +128,7 @@ export class RoleBasedAccessControlModule {
   static forRootAsync (options: RoleBasedAccessControlAsyncOptions): DynamicModule {
     return {
       module: RoleBasedAccessControlModule,
+      imports: options.imports,
       providers: [
         ...this.createAsyncProviders(options),
         RolesDecoratorsGuard,
