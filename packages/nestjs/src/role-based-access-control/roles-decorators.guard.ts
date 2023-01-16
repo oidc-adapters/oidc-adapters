@@ -20,11 +20,11 @@ const logger = new Logger('RoleBasedAccessControl')
 @Injectable()
 export class RolesDecoratorsGuard implements CanActivate {
   constructor (
-    @Inject(Reflector) private reflector: Reflector,
-    @Inject(RoleBasedAccessControlService) private accessControlService: RoleBasedAccessControlService,
+    private reflector: Reflector,
+    private accessControlService: RoleBasedAccessControlService,
     @Optional() @Inject(ROLES_GUARD_OPTIONS) private defaultOptions: RolesGuardOptions,
     // eslint-disable-next-line unicorn/prevent-abbreviations
-    @Inject(ModuleRef) private moduleRef: ModuleRef) {
+    private moduleRef: ModuleRef) {
   }
 
   async authenticate (context: ExecutionContext, effectiveOptions?: RolesGuardOptions) {

@@ -6,7 +6,9 @@ import { PermissionBasedAccessControlService } from './permission-based-access-c
 import { RESOURCE_KEY } from './resource.decorator.js'
 import { SCOPES_KEY } from './scopes.decorator.js'
 import { PERMISSIONS_OPTIONS_KEY } from './permissions-options.decorator.js'
-import { PermissionsGuardOptions, PERMISSIONS_GUARD_OPTIONS, PermissionsGuard } from './permissions.guard.js'
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+import type { PermissionsGuardOptions } from './permissions.guard.js'
+import { PERMISSIONS_GUARD_OPTIONS, PermissionsGuard } from './permissions.guard.js'
 import { PUBLIC_KEY } from '../common/public.decorator.js'
 import type { IAuthGuard, Type } from '@nestjs/passport'
 import { AuthGuard } from '@nestjs/passport'
@@ -19,11 +21,11 @@ const logger = new Logger('PermissionsBasedAccessControl')
 @Injectable()
 export class PermissionsDecoratorsGuard implements CanActivate {
   constructor (
-    @Inject(Reflector) private reflector: Reflector,
-    @Inject(PermissionBasedAccessControlService) private accessControlService: PermissionBasedAccessControlService,
+    private reflector: Reflector,
+    private accessControlService: PermissionBasedAccessControlService,
     @Optional() @Inject(PERMISSIONS_GUARD_OPTIONS) private defaultOptions: PermissionsGuardOptions,
     // eslint-disable-next-line unicorn/prevent-abbreviations
-    @Inject(ModuleRef) private moduleRef: ModuleRef) {
+    private moduleRef: ModuleRef) {
   }
 
   async authenticate (context: ExecutionContext, effectiveOptions?: PermissionsGuardOptions) {

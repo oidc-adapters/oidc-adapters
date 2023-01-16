@@ -14,7 +14,7 @@ export const PERMISSIONS_GUARD_OPTIONS = Symbol('PermissionsGuardOptions')
 export function PermissionsGuard (permissions: PermissionsSpec, options?: PermissionsGuardOptions): Type<CanActivate> {
   @Injectable()
   class PermissionsGuardMixin implements CanActivate {
-    constructor (@Inject(PermissionBasedAccessControlService) private service: PermissionBasedAccessControlService) {
+    constructor (private service: PermissionBasedAccessControlService) {
     }
 
     canActivate (context: ExecutionContext): boolean | Promise<boolean> {

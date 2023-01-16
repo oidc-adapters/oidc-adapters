@@ -5,8 +5,7 @@ import { Controller, Delete, Get, Global, Module, Request, UseGuards } from '@ne
 import { agent } from 'supertest'
 import { PermissionBasedAccessControlModule } from './permission-based-access-control.module.js'
 import { OidcPassportModule } from '../oidc-passport/index.js'
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
-import type { PermissionsGuard } from './permissions.guard.js'
+import { PermissionsGuard } from './permissions.guard.js'
 import { directGrant } from '../../__tests__/utils/auth.js'
 import { KeycloakPermissionsProvider } from '@oidc-adapters/keycloak'
 import { AuthGuard } from '@nestjs/passport'

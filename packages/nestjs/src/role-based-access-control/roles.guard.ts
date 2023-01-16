@@ -2,7 +2,6 @@ import type { CanActivate, ExecutionContext } from '@nestjs/common'
 import { Inject, Injectable, mixin, Optional } from '@nestjs/common'
 import type { IAuthGuard, Type, AuthGuard } from '@nestjs/passport'
 import { RoleBasedAccessControlService } from './role-based-access-control.service.js'
-import { ModuleRef } from '@nestjs/core'
 
 export interface RolesGuardOptions {
   mode?: 'one' | 'all',
@@ -17,10 +16,8 @@ export function RolesGuard (roles: string | Iterable<string>, options?: RolesGua
     private effectiveOptions: RolesGuardOptions
 
     constructor (
-      @Inject(RoleBasedAccessControlService) private service: RoleBasedAccessControlService,
-      @Optional() @Inject(ROLES_GUARD_OPTIONS) private defaultOptions: RolesGuardOptions,
-      // eslint-disable-next-line unicorn/prevent-abbreviations
-      @Inject(ModuleRef) private moduleRef: ModuleRef) {
+      private service: RoleBasedAccessControlService,
+      @Optional() @Inject(ROLES_GUARD_OPTIONS) private defaultOptions: RolesGuardOptions) {
       this.effectiveOptions = { ...defaultOptions, ...options }
     }
 
