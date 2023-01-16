@@ -1,0 +1,59 @@
+From 7f410149f29bc0c44b00514252f2e938e0248716 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?R=C3=A9mi=20Alvergnat?= <toilal.dev@gmail.com>
+Date: Mon, 16 Jan 2023 16:54:51 +0100
+Subject: [PATCH] fix: skip import type nodes in no-unpublished-import rule
+ (#78)
+
+---
+ lib/rules/no-unpublished-import.js |  2 +-
+ lib/util/visit-import.js           | 12 +++++++++++-
+ 2 files changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/lib/rules/no-unpublished-import.js b/lib/rules/no-unpublished-import.js
+index 37694f50..7bda015a 100644
+--- a/lib/rules/no-unpublished-import.js
++++ b/lib/rules/no-unpublished-import.js
+@@ -40,7 +40,7 @@ module.exports = {
+             return {}
+         }
+
+-        return visitImport(context, {}, targets => {
++        return visitImport(context, { excludeTypeImport: true }, targets => {
+             checkPublish(context, filePath, targets)
+         })
+     },
+diff --git a/lib/util/visit-import.js b/lib/util/visit-import.js
+index 66898e6f..f0dbc6a2 100644
+--- a/lib/util/visit-import.js
++++ b/lib/util/visit-import.js
+@@ -20,12 +20,13 @@ const stripImportPathParams = require("./strip-import-path-params")
+  * @param {Object} [options] - The flag to include core modules.
+  * @param {boolean} [options.includeCore] - The flag to include core modules.
+  * @param {number} [options.optionIndex] - The index of rule options.
++ * @param {boolean} [options.excludeTypeImport] - The flag to exclude typescript type imports.
+  * @param {function(ImportTarget[]):void} callback The callback function to get result.
+  * @returns {ImportTarget[]} A list of found target's information.
+  */
+ module.exports = function visitImport(
+     context,
+-    { includeCore = false, optionIndex = 0 } = {},
++    { includeCore = false, optionIndex = 0, excludeTypeImport = false } = {},
+     callback
+ ) {
+     const targets = []
+@@ -52,6 +53,15 @@ module.exports = function visitImport(
+                 return
+             }
+
++            // skip `import type { foo } from 'bar'` (for eslint-typescript)
++            if (
++                excludeTypeImport &&
++                node.type === "ImportDeclaration" &&
++                node.importKind === "type"
++            ) {
++                return
++            }
++
+             const name = sourceNode && stripImportPathParams(sourceNode.value)
+             // Note: "999" arbitrary to check current/future Node.js version
+             if (name && (includeCore || !isCoreModule(name, "999"))) {

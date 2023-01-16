@@ -1,6 +1,7 @@
 {
   "name": "@oidc-adapters/oidc-adapters",
   "description": "A collection of Node.js packages to authenticate users from any standard OpenID Connect Identity Provider",
+  "version": "0.0.0-development",
   "private": true,
   "license": "MIT",
   "engines": {
@@ -28,5 +29,8 @@
     "rimraf": "^3.0.2",
     "syncpack": "^8.4.11"
   },
-  "repository": "oidc-adapters/oidc-adapters.git"
+  "repository": "oidc-adapters/oidc-adapters.git",
+  "resolutions": {
+    "eslint-plugin-n@^15.6.1": "patch:eslint-plugin-n@npm%3A15.6.1#./.yarn/patches/eslint-community-eslint-plugin-n-npm-15.6.1.patch"
+  }
 }

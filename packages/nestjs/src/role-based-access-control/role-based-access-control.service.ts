@@ -1,5 +1,6 @@
 import type { ExecutionContext } from '@nestjs/common'
 import { Inject, Injectable } from '@nestjs/common'
+// eslint-disable-next-line n/no-unpublished-import
 import type { RolesProvider } from '@oidc-adapters/core'
 import { userFromContext } from '../common/context.utils.js'
 

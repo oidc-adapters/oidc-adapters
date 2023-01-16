@@ -1,5 +1,5 @@
 import type { CanActivate, ExecutionContext } from '@nestjs/common'
-import { Inject, Injectable, mixin } from '@nestjs/common'
+import { Injectable, mixin } from '@nestjs/common'
 import type { Type, AuthGuard, IAuthGuard } from '@nestjs/passport'
 import type { PermissionsSpec } from './permission-based-access-control.service.js'
 import { PermissionBasedAccessControlService } from './permission-based-access-control.service.js'
