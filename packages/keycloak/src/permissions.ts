@@ -233,7 +233,7 @@ export class KeycloakUmaTicketPermissionsProvider implements PermissionsProvider
     return [...this.permissions]
   }
 
-  getResourcePermissions (resource: string): string[] | Promise<string[]> {
+  getResourcePermissions (resource: string): string[] {
     const currentResourcePermissions = this.resourcePermissions.get(resource)
     return currentResourcePermissions ? [...currentResourcePermissions] : []
   }
