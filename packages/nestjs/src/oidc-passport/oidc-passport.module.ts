@@ -11,7 +11,7 @@ import { Module } from '@nestjs/common'
 import type { StrategyOptions, VerifyCallback, VerifyCallbackWithRequest } from '@oidc-adapters/passport'
 import { Strategy } from '@oidc-adapters/passport'
 import { AuthGuard, PassportStrategy } from '@nestjs/passport'
-import { APP_GUARD, ModuleRef } from '@nestjs/core'
+import { APP_GUARD } from '@nestjs/core'
 import { OptionalAuthGuard } from './optional-auth.guard.js'
 
 export const OIDC_PASSPORT_OPTIONS = Symbol('OidcPassportOptions')
@@ -107,7 +107,7 @@ export class OidcPassportModule {
   private static createAppGuardProvider (): Provider {
     return {
       provide: APP_GUARD,
-      inject: [OIDC_PASSPORT_OPTIONS, ModuleRef],
+      inject: [OIDC_PASSPORT_OPTIONS],
       useFactory: (options: OidcPassportOptions): Type<CanActivate> | CanActivate | undefined => {
         if (options.appGuard === 'optional') {
           return OptionalAuthGuard(options.strategyName ?? 'oidc')
