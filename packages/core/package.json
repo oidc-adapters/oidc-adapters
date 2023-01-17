@@ -15,7 +15,6 @@
     "node": ">=18"
   },
   "scripts": {
-    "preinstall": "npx only-allow yarn",
     "clean": "rimraf dist/",
     "build": "yarn build:types && yarn build:swc",
     "build:swc": "swc ./src --source-maps inline --out-dir ./dist/esm",
